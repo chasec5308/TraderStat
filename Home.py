@@ -220,7 +220,7 @@ if trades:
         st.markdown(f"""<div class="stat-card"><div class="stat-label">Prop Accounts</div>
         <div class="stat-value">{len(accounts)}</div></div>""", unsafe_allow_html=True)
         with col5:
-    st.markdown(f"""
+            st.markdown(f"""
     <div class="stat-card">
         <div class="stat-label">Trader Score</div>
         <div class="stat-value">{trader_score}/100</div>
