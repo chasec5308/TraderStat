@@ -171,8 +171,38 @@ st.markdown("""
 # ── Quick Stats ────────────────────────────────────────────────────────────────
 trades   = db.get_trades()
 accounts = db.get_prop_accounts()
+# --- Trader Score ---
+trader_score = 0
 
-col1, col2, col3, col4 = st.columns(4)
+if not df.empty:
+    total_trades = len(df)
+
+    win_rate_decimal = (df["pnl"] > 0).mean()
+    avg_r = df["r_multiple"].mean()
+
+    # Max drawdown from cumulative P&L
+    equity_curve = df["pnl"].cumsum()
+    running_max = equity_curve.cummax()
+    drawdown = equity_curve - running_max
+    max_drawdown = abs(drawdown.min()) if not drawdown.empty else 0
+
+    # Simple scoring model
+    win_rate_score = win_rate_decimal * 40          # up to 40 pts
+    avg_r_score = max(min(avg_r, 3), 0) / 3 * 30   # up to 30 pts
+    trade_count_score = min(total_trades, 50) / 50 * 15  # up to 15 pts
+
+    # Lower drawdown = better score
+    if max_drawdown <= 100:
+        drawdown_score = 15
+    elif max_drawdown <= 300:
+        drawdown_score = 10
+    elif max_drawdown <= 500:
+        drawdown_score = 5
+    else:
+        drawdown_score = 0
+
+    trader_score = int(win_rate_score + avg_r_score + trade_count_score + drawdown_score)
+col1, col2, col3, col4, col5 = st.columns(5)
 if trades:
     stats = utils.compute_stats(trades)
     with col1:
@@ -189,6 +219,13 @@ if trades:
     with col4:
         st.markdown(f"""<div class="stat-card"><div class="stat-label">Prop Accounts</div>
         <div class="stat-value">{len(accounts)}</div></div>""", unsafe_allow_html=True)
+        with col5:
+    st.markdown(f"""
+    <div class="stat-card">
+        <div class="stat-label">Trader Score</div>
+        <div class="stat-value">{trader_score}/100</div>
+    </div>
+    """, unsafe_allow_html=True)
 else:
     for col, (label, val) in zip([col1, col2, col3, col4], [
         ("Total Trades", "0"), ("Win Rate", "—"), ("Total P&L", "$0.00"), ("Prop Accounts", str(len(accounts)))
