@@ -262,3 +262,34 @@ if not df_display.empty:
         file_name=f"traderstat_journal_{date.today()}.csv",
         mime="text/csv",
     )
+# --- Equity Curve ---
+import plotly.express as px
+
+if not df.empty:
+
+    df = df.sort_values("trade_date")
+
+    df["equity"] = df["pnl"].cumsum()
+
+    st.subheader("Equity Curve")
+
+    fig = px.line(
+        df,
+        x="trade_date",
+        y="equity",
+        markers=True
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+
+# --- Strategy Analytics ---
+st.subheader("Strategy Performance")
+
+strategy_stats = df.groupby("strategy").agg(
+    trades=("strategy", "count"),
+    pnl=("pnl", "sum"),
+    avg_r=("r_multiple", "mean")
+)
+
+st.dataframe(strategy_stats)
