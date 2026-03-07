@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TraderStat — Free Trading Tools for Serious Traders</title>
+  <meta name="description" content="Free trade journal, risk calculator, and prop firm tracker for futures, options, and day traders. No signup required. Start tracking your edge today." />
+  <meta property="og:title" content="TraderStat — Free Trading Tools" />
+  <meta property="og:description" content="Trade journal, risk calculator, and prop firm tracker. Free forever for the core tools." />
+  <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:    #00D4AA;
+      --primary-d:  #00B894;
+      --bg:         #0D1117;
+      --surface:    #161B22;
+      --surface2:   #1A1A2E;
+      --border:     rgba(0,212,170,0.18);
+      --text:       #EAEAEA;
+      --muted:      #8B949E;
+      --red:        #E94560;
+      --orange:     #F6AD55;
+      --yellow:     #F6E05E;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; overflow-x: hidden; }
+
+    /* ── UTILITY ── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+    .text-center { text-align: center; }
+    .text-primary { color: var(--primary); }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 28px; border-radius: 10px;
+      font-size: 0.95rem; font-weight: 700; cursor: pointer;
+      text-decoration: none; transition: all .2s; border: none;
+      font-family: 'Inter', sans-serif;
+    }
+    .btn-primary { background: var(--primary); color: #0D1117; }
+    .btn-primary:hover { background: var(--primary-d); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,212,170,0.35); }
+    .btn-outline { background: transparent; color: var(--text); border: 1.5px solid rgba(255,255,255,0.15); }
+    .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+    .btn-lg { padding: 16px 36px; font-size: 1.05rem; border-radius: 12px; }
+    .btn-xl { padding: 18px 44px; font-size: 1.15rem; border-radius: 14px; }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(13,17,23,0.94); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: 1100px; margin: 0 auto; padding: 0 24px;
+      height: 66px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo-icon { font-size: 1.7rem; }
+    .nav-logo-text { font-size: 1.3rem; font-weight: 800; color: var(--primary); letter-spacing: 0.02em; }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: color .2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-free-badge {
+      background: rgba(0,212,170,0.12); border: 1px solid rgba(0,212,170,0.3);
+      color: var(--primary); padding: 4px 12px; border-radius: 20px;
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 94vh; display: flex; align-items: center;
+      padding: 80px 24px 60px; position: relative; overflow: hidden;
+    }
+    .hero-glow {
+      position: absolute; top: -20%; left: 50%; transform: translateX(-50%);
+      width: 900px; height: 900px;
+      background: radial-gradient(circle, rgba(0,212,170,0.06) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-content { max-width: 1100px; margin: 0 auto; width: 100%; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(0,212,170,0.08); border: 1px solid rgba(0,212,170,0.25);
+      color: var(--primary); padding: 7px 18px; border-radius: 24px;
+      font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+    .hero h1 {
+      font-size: clamp(2.8rem, 6.5vw, 5.2rem); font-weight: 900; line-height: 1.08;
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, #FFFFFF 0%, #EAEAEA 40%, #00D4AA 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.22rem); color: var(--muted);
+      max-width: 620px; line-height: 1.78; margin-bottom: 40px;
+    }
+    .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 56px; }
+    .hero-proof {
+      display: flex; align-items: center; gap: 20px;
+      color: var(--muted); font-size: 0.85rem; flex-wrap: wrap;
+    }
+    .proof-item { display: flex; align-items: center; gap: 6px; }
+    .proof-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); }
+
+    /* ── PROBLEM STRIP ── */
+    .problem-strip {
+      background: var(--surface);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      padding: 72px 24px;
+    }
+    .section-eyebrow {
+      color: var(--primary); font-size: 0.78rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 14px;
+    }
+    .section-title { font-size: clamp(1.8rem, 3.5vw, 2.6rem); font-weight: 800; margin-bottom: 16px; }
+    .section-sub { color: var(--muted); font-size: 1.05rem; max-width: 560px; line-height: 1.75; margin-bottom: 52px; }
+    .problem-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+    .problem-card {
+      background: var(--surface2); border: 1px solid rgba(233,69,96,0.18);
+      border-radius: 14px; padding: 28px 24px;
+    }
+    .problem-icon { font-size: 2rem; margin-bottom: 14px; }
+    .problem-card h3 { font-size: 0.98rem; font-weight: 700; color: var(--red); margin-bottom: 8px; }
+    .problem-card p { color: var(--muted); font-size: 0.87rem; line-height: 1.65; }
+
+    /* ── SOLUTION / FEATURES ── */
+    .features-section { padding: 96px 24px; }
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 24px; }
+    .feature-card {
+      background: linear-gradient(135deg, var(--surface2) 0%, #16213E 100%);
+      border: 1px solid var(--border); border-radius: 18px; padding: 36px 30px;
+      transition: border-color .25s, transform .25s;
+    }
+    .feature-card:hover { border-color: rgba(0,212,170,0.5); transform: translateY(-4px); }
+    .feature-number {
+      display: inline-block; background: rgba(0,212,170,0.1); border: 1px solid rgba(0,212,170,0.25);
+      color: var(--primary); width: 36px; height: 36px; border-radius: 10px;
+      font-size: 0.85rem; font-weight: 800; display: flex; align-items: center; justify-content: center;
+      margin-bottom: 18px;
+    }
+    .feature-icon { font-size: 2.6rem; margin-bottom: 16px; }
+    .feature-card h3 { font-size: 1.18rem; font-weight: 800; margin-bottom: 12px; }
+    .feature-card p { color: var(--muted); font-size: 0.9rem; line-height: 1.72; margin-bottom: 18px; }
+    .feature-list { list-style: none; }
+    .feature-list li {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 0.87rem; color: var(--text); padding: 5px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .feature-list li:last-child { border-bottom: none; }
+    .feature-list .check { color: var(--primary); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+
+    /* ── MOCK SCREENSHOT ── */
+    .screenshot-section { padding: 0 24px 96px; }
+    .screenshot-wrapper {
+      background: linear-gradient(135deg, #16213E, #1A1A2E);
+      border: 1px solid var(--border); border-radius: 20px;
+      padding: 32px; max-width: 1000px; margin: 0 auto;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+    }
+    .mock-browser-bar {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 20px;
+    }
+    .mock-dot { width: 12px; height: 12px; border-radius: 50%; }
+    .mock-dot.red { background: #FF5F57; }
+    .mock-dot.yellow { background: #FFBD2E; }
+    .mock-dot.green { background: #28CA41; }
+    .mock-url-bar {
+      flex: 1; background: rgba(255,255,255,0.06); border-radius: 6px;
+      padding: 6px 14px; font-size: 0.8rem; color: var(--muted);
+      margin-left: 8px;
+    }
+    .mock-screen {
+      background: #0D1117; border-radius: 12px; padding: 24px;
+      min-height: 360px;
+    }
+    .mock-header {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 24px;
+    }
+    .mock-logo { color: var(--primary); font-size: 1.2rem; font-weight: 800; }
+    .mock-nav { display: flex; gap: 16px; margin-left: 24px; }
+    .mock-nav-item {
+      background: rgba(255,255,255,0.05); border-radius: 6px;
+      padding: 6px 14px; font-size: 0.78rem; color: var(--muted);
+    }
+    .mock-nav-item.active { background: rgba(0,212,170,0.12); color: var(--primary); }
+    .mock-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+    .mock-kpi {
+      background: linear-gradient(135deg, #16213E, #1A1A2E);
+      border: 1px solid rgba(0,212,170,0.12); border-radius: 10px;
+      padding: 16px; text-align: center;
+    }
+    .mock-kpi-label { color: var(--muted); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+    .mock-kpi-value { font-size: 1.3rem; font-weight: 700; }
+    .mock-kpi-value.green { color: var(--primary); }
+    .mock-kpi-value.red { color: var(--red); }
+    .mock-chart {
+      background: rgba(22,33,62,0.6); border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 10px; padding: 16px; height: 120px;
+      display: flex; align-items: flex-end; gap: 4px;
+    }
+    .mock-bar { border-radius: 3px 3px 0 0; flex: 1; }
+
+    /* ── HOW IT WORKS ── */
+    .how-section { padding: 96px 24px; background: var(--surface); }
+    .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 32px; }
+    .step { text-align: center; padding: 0 12px; }
+    .step-num {
+      width: 54px; height: 54px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-d));
+      color: #0D1117; font-size: 1.3rem; font-weight: 900;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 18px; box-shadow: 0 6px 20px rgba(0,212,170,0.3);
+    }
+    .step h3 { font-size: 1.02rem; font-weight: 700; margin-bottom: 10px; }
+    .step p { color: var(--muted); font-size: 0.88rem; line-height: 1.68; }
+
+    /* ── FREE BANNER ── */
+    .free-banner {
+      background: linear-gradient(135deg, rgba(0,212,170,0.08), rgba(0,212,170,0.03));
+      border: 1px solid rgba(0,212,170,0.2);
+      border-radius: 20px; padding: 52px 40px; text-align: center;
+      margin: 0 24px 96px; max-width: 820px; margin-left: auto; margin-right: auto;
+    }
+    .free-banner h2 { font-size: clamp(1.8rem, 3vw, 2.4rem); font-weight: 900; margin-bottom: 14px; }
+    .free-banner p { color: var(--muted); font-size: 1.05rem; max-width: 520px; margin: 0 auto 32px; line-height: 1.7; }
+    .free-features { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-bottom: 36px; }
+    .free-tag {
+      background: rgba(0,212,170,0.1); border: 1px solid rgba(0,212,170,0.25);
+      color: var(--primary); padding: 6px 16px; border-radius: 20px;
+      font-size: 0.85rem; font-weight: 600;
+    }
+
+    /* ── TESTIMONIALS ── */
+    .testimonials-section { padding: 96px 24px; }
+    .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 22px; }
+    .testimonial-card {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 16px; padding: 30px 26px;
+    }
+    .stars { color: var(--orange); font-size: 1rem; margin-bottom: 14px; letter-spacing: 2px; }
+    .testimonial-text { color: var(--text); font-size: 0.92rem; line-height: 1.72; margin-bottom: 22px; font-style: italic; }
+    .testimonial-author { display: flex; align-items: center; gap: 12px; }
+    .author-avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-d));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 0.9rem; color: #0D1117; flex-shrink: 0;
+    }
+    .author-name { font-weight: 700; font-size: 0.9rem; }
+    .author-role { color: var(--muted); font-size: 0.78rem; margin-top: 2px; }
+
+    /* ── FAQ ── */
+    .faq-section { padding: 96px 24px; background: var(--surface); }
+    .faq-list { max-width: 740px; margin: 0 auto; }
+    details {
+      border: 1px solid var(--border); border-radius: 12px;
+      margin-bottom: 12px; overflow: hidden;
+    }
+    summary {
+      padding: 20px 24px; font-weight: 600; cursor: pointer;
+      list-style: none; display: flex; justify-content: space-between; align-items: center;
+      background: var(--surface2); font-size: 0.95rem;
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: '+'; color: var(--primary); font-size: 1.4rem; font-weight: 300; line-height: 1; }
+    details[open] summary::after { content: '−'; }
+    .faq-body { padding: 0 24px 22px; color: var(--muted); font-size: 0.92rem; line-height: 1.72; background: var(--surface2); }
+
+    /* ── FINAL CTA ── */
+    .final-cta {
+      padding: 112px 24px; text-align: center;
+      background: linear-gradient(180deg, var(--bg) 0%, #16213E 50%, var(--bg) 100%);
+      position: relative; overflow: hidden;
+    }
+    .final-cta::before {
+      content: '';
+      position: absolute; bottom: -10%; left: 50%; transform: translateX(-50%);
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(0,212,170,0.07) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .final-cta h2 { font-size: clamp(2.2rem, 4.5vw, 3.4rem); font-weight: 900; margin-bottom: 18px; }
+    .final-cta p { color: var(--muted); font-size: 1.08rem; max-width: 520px; margin: 0 auto 44px; line-height: 1.72; }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 48px 24px 32px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .footer-inner { max-width: 1100px; margin: 0 auto; }
+    .footer-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 32px; margin-bottom: 40px; }
+    .footer-brand p { color: var(--muted); font-size: 0.88rem; max-width: 280px; line-height: 1.7; margin-top: 10px; }
+    .footer-links { display: flex; gap: 48px; flex-wrap: wrap; }
+    .footer-col h4 { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 14px; }
+    .footer-col a { display: block; color: var(--muted); text-decoration: none; font-size: 0.88rem; margin-bottom: 9px; transition: color .2s; }
+    .footer-col a:hover { color: var(--primary); }
+    .footer-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.05); color: var(--muted); font-size: 0.82rem; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .mock-kpis { grid-template-columns: repeat(2, 1fr); }
+      .footer-top { flex-direction: column; }
+      .hero-actions { flex-direction: column; align-items: flex-start; }
+      .free-banner { padding: 40px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════ NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <span class="nav-logo-icon">📊</span>
+      <span class="nav-logo-text">TraderStat</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how-it-works">How It Works</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <span class="nav-free-badge">✨ 100% FREE</span>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════ HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <div class="hero-badge">🚀 Free Trading Tools — No Signup Required</div>
+    <h1>Stop Trading Blind.<br/>Start Trading Smart.</h1>
+    <p class="hero-sub">
+      TraderStat gives futures, options, and prop firm traders a free toolkit to manage risk,
+      journal every trade, and track prop firm evaluations — all in one clean, fast app.
+    </p>
+    <div class="hero-actions">
+      <a href="https://traderstat.streamlit.app" class="btn btn-primary btn-xl" target="_blank">
+        🚀 Try TraderStat Free
+      </a>
+      <a href="#features" class="btn btn-outline btn-lg">See All Features</a>
+    </div>
+    <div class="hero-proof">
+      <div class="proof-item"><div class="proof-dot"></div>No signup required</div>
+      <div class="proof-item"><div class="proof-dot"></div>No credit card</div>
+      <div class="proof-item"><div class="proof-dot"></div>Works in your browser</div>
+      <div class="proof-item"><div class="proof-dot"></div>Futures · Options · Stocks</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ PROBLEM -->
+<section class="problem-strip">
+  <div class="container text-center">
+    <div class="section-eyebrow">The Problem</div>
+    <h2 class="section-title">Why Most Retail Traders Lose Money</h2>
+    <p class="section-sub" style="margin-left:auto;margin-right:auto;">It's rarely the strategy. It's almost always one of these four process failures.</p>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="problem-icon">💸</div>
+        <h3>Oversizing Positions</h3>
+        <p>Trading by feel instead of math. One bad trade wipes out a week of gains because the position was too large for the account.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">🗂️</div>
+        <h3>No Trade Journal</h3>
+        <p>Without a journal, you repeat the same mistakes indefinitely. You can't improve what you don't measure. Patterns stay invisible.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">🏦</div>
+        <h3>Breaking Prop Firm Rules</h3>
+        <p>Prop traders lose funded accounts by accidentally breaching daily loss limits — often without realising it until the account is failed.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">📊</div>
+        <h3>No Performance Data</h3>
+        <p>Without statistics, you don't know your real win rate, average R, or which strategies actually make money. You're flying blind.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ FEATURES -->
+<section class="features-section" id="features">
+  <div class="container text-center">
+    <div class="section-eyebrow">The Solution</div>
+    <h2 class="section-title">Three Tools. One App. All Free.</h2>
+    <p class="section-sub" style="margin-left:auto;margin-right:auto;">Everything a serious trader needs to manage risk, track performance, and pass evaluations.</p>
+  </div>
+  <div class="container">
+    <div class="features-grid">
+
+      <div class="feature-card">
+        <div class="feature-icon">📒</div>
+        <h3>Trade Journal</h3>
+        <p>Log every trade in 30 seconds. TraderStat automatically calculates your R multiple, P&L, win rate, profit factor, and equity curve. No spreadsheets required.</p>
+        <ul class="feature-list">
+          <li><span class="check">✓</span> Auto-calculated R multiple & P&L</li>
+          <li><span class="check">✓</span> Interactive equity curve chart</li>
+          <li><span class="check">✓</span> Win rate & profit factor</li>
+          <li><span class="check">✓</span> Strategy performance breakdown</li>
+          <li><span class="check">✓</span> Monthly P&L chart</li>
+          <li><span class="check">✓</span> Filter by ticker, direction, strategy</li>
+          <li><span class="check">✓</span> Export to CSV anytime</li>
+        </ul>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🧮</div>
+        <h3>Risk Calculator</h3>
+        <p>Enter your account size, risk %, entry, and stop loss. Instantly get your correct position size, exact dollar risk, and 1R/2R/3R profit targets. Never over-risk again.</p>
+        <ul class="feature-list">
+          <li><span class="check">✓</span> Stocks, Futures & Options</li>
+          <li><span class="check">✓</span> Correct contract rounding</li>
+          <li><span class="check">✓</span> Dollar risk calculation</li>
+          <li><span class="check">✓</span> 1R / 2R / 3R profit targets</li>
+          <li><span class="check">✓</span> Visual risk/reward chart</li>
+          <li><span class="check">✓</span> Risk management education</li>
+        </ul>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🏦</div>
+        <h3>Prop Firm Tracker</h3>
+        <p>Track multiple prop firm evaluations simultaneously. Get live danger alerts before you breach daily loss limits or max drawdown rules. Pass your challenge.</p>
+        <ul class="feature-list">
+          <li><span class="check">✓</span> Works with any prop firm</li>
+          <li><span class="check">✓</span> Live drawdown monitoring</li>
+          <li><span class="check">✓</span> Progress to profit target</li>
+          <li><span class="check">✓</span> 🚨 Danger alerts</li>
+          <li><span class="check">✓</span> Balance history chart</li>
+          <li><span class="check">✓</span> FTMO, Apex, TopStep, MFF rules reference</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ SCREENSHOT MOCK -->
+<section class="screenshot-section">
+  <div class="container text-center">
+    <div class="section-eyebrow">App Preview</div>
+    <h2 class="section-title" style="margin-bottom:40px;">Clean. Fast. Professional.</h2>
+  </div>
+  <div class="screenshot-wrapper">
+    <div class="mock-browser-bar">
+      <div class="mock-dot red"></div>
+      <div class="mock-dot yellow"></div>
+      <div class="mock-dot green"></div>
+      <div class="mock-url-bar">🔒 traderstat.streamlit.app</div>
+    </div>
+    <div class="mock-screen">
+      <div class="mock-header">
+        <span class="mock-logo">📊 TraderStat</span>
+        <div class="mock-nav">
+          <span class="mock-nav-item active">🏠 Dashboard</span>
+          <span class="mock-nav-item">📒 Journal</span>
+          <span class="mock-nav-item">🧮 Risk Calc</span>
+          <span class="mock-nav-item">🏦 Prop Tracker</span>
+        </div>
+      </div>
+      <div class="mock-kpis">
+        <div class="mock-kpi">
+          <div class="mock-kpi-label">Total Trades</div>
+          <div class="mock-kpi-value">47</div>
+        </div>
+        <div class="mock-kpi">
+          <div class="mock-kpi-label">Win Rate</div>
+          <div class="mock-kpi-value green">64.0%</div>
+        </div>
+        <div class="mock-kpi">
+          <div class="mock-kpi-label">Total P&L</div>
+          <div class="mock-kpi-value green">$2,840</div>
+        </div>
+        <div class="mock-kpi">
+          <div class="mock-kpi-label">Avg R</div>
+          <div class="mock-kpi-value green">+1.4R</div>
+        </div>
+      </div>
+      <div class="mock-chart">
+        <!-- Simulated equity curve bars -->
+        <div class="mock-bar" style="height:30%;background:rgba(0,212,170,0.4)"></div>
+        <div class="mock-bar" style="height:45%;background:rgba(0,212,170,0.5)"></div>
+        <div class="mock-bar" style="height:38%;background:rgba(233,69,96,0.4)"></div>
+        <div class="mock-bar" style="height:55%;background:rgba(0,212,170,0.5)"></div>
+        <div class="mock-bar" style="height:62%;background:rgba(0,212,170,0.6)"></div>
+        <div class="mock-bar" style="height:50%;background:rgba(233,69,96,0.4)"></div>
+        <div class="mock-bar" style="height:70%;background:rgba(0,212,170,0.6)"></div>
+        <div class="mock-bar" style="height:75%;background:rgba(0,212,170,0.65)"></div>
+        <div class="mock-bar" style="height:65%;background:rgba(233,69,96,0.35)"></div>
+        <div class="mock-bar" style="height:82%;background:rgba(0,212,170,0.7)"></div>
+        <div class="mock-bar" style="height:88%;background:rgba(0,212,170,0.75)"></div>
+        <div class="mock-bar" style="height:78%;background:rgba(233,69,96,0.4)"></div>
+        <div class="mock-bar" style="height:92%;background:rgba(0,212,170,0.8)"></div>
+        <div class="mock-bar" style="height:96%;background:rgba(0,212,170,0.85)"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ HOW IT WORKS -->
+<section class="how-section" id="how-it-works">
+  <div class="container text-center">
+    <div class="section-eyebrow">How It Works</div>
+    <h2 class="section-title">Up and Running in 60 Seconds</h2>
+    <p class="section-sub" style="margin-left:auto;margin-right:auto;">No account. No download. No setup. Just open the app and start trading smarter.</p>
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Open the App</h3>
+        <p>Click "Try TraderStat Free." The app opens instantly in your browser. No signup, no email, no password.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Calculate Your Risk</h3>
+        <p>Before your next trade, use the Risk Calculator. Enter your account size, risk %, entry, and stop. Get your exact position size in seconds.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Log Your Trades</h3>
+        <p>After each trade, log it in the journal. 30 seconds. R multiple and P&L are calculated automatically. Watch your equity curve grow.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h3>Track Your Evaluation</h3>
+        <p>If you're in a prop firm challenge, add your account. Monitor your drawdown and profit progress in real time. Stay within the rules.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ FREE BANNER -->
+<div style="padding: 96px 24px 0;">
+  <div class="free-banner">
+    <div style="font-size:2.5rem;margin-bottom:16px;">🎁</div>
+    <h2>Completely Free to Use</h2>
+    <p>No credit card. No subscription. No catch. All three tools are free to use right now in your browser.</p>
+    <div class="free-features">
+      <span class="free-tag">✓ Trade Journal</span>
+      <span class="free-tag">✓ Risk Calculator</span>
+      <span class="free-tag">✓ Prop Firm Tracker</span>
+      <span class="free-tag">✓ All Charts & Analytics</span>
+      <span class="free-tag">✓ CSV Export</span>
+      <span class="free-tag">✓ No Signup</span>
+    </div>
+    <a href="https://traderstat.streamlit.app" class="btn btn-primary btn-xl" target="_blank">
+      🚀 Open TraderStat Now — It's Free
+    </a>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ TESTIMONIALS -->
+<section class="testimonials-section">
+  <div class="container text-center">
+    <div class="section-eyebrow">Trader Feedback</div>
+    <h2 class="section-title">What Traders Are Saying</h2>
+    <p class="section-sub" style="margin-left:auto;margin-right:auto;">Early feedback from traders who use TraderStat every day.</p>
+  </div>
+  <div class="container">
+    <div class="testimonials-grid">
+      <div class="testimonial-card">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">"The Risk Calculator alone changed how I trade. I used to size by feel. Now I know exactly how many contracts to trade before I even place the order. My drawdowns are way smaller."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">MK</div>
+          <div>
+            <div class="author-name">Marcus K.</div>
+            <div class="author-role">ES Futures Trader</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">"I was on my third FTMO attempt when I found this. The Prop Firm Tracker showed me I was getting close to my daily limit on Tuesday — I stopped trading and saved my account. Passed that attempt."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">SR</div>
+          <div>
+            <div class="author-name">Sarah R.</div>
+            <div class="author-role">FTMO Funded Trader</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">"Finally a trade journal that doesn't require a PhD to set up. I log every trade in 30 seconds and the equity curve shows me exactly when I'm in a drawdown and need to reduce size."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">JT</div>
+          <div>
+            <div class="author-name">James T.</div>
+            <div class="author-role">SPY/QQQ Options Trader</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ FAQ -->
+<section class="faq-section" id="faq">
+  <div class="container text-center">
+    <div class="section-eyebrow">FAQ</div>
+    <h2 class="section-title">Frequently Asked Questions</h2>
+    <p class="section-sub" style="margin-left:auto;margin-right:auto;">Everything you need to know before getting started.</p>
+  </div>
+  <div class="faq-list">
+    <details>
+      <summary>Is TraderStat really free?</summary>
+      <div class="faq-body">Yes. All three tools — Trade Journal, Risk Calculator, and Prop Firm Tracker — are completely free to use. No credit card, no signup, no subscription. Just open the app and start using it.</div>
+    </details>
+    <details>
+      <summary>Do I need to create an account?</summary>
+      <div class="faq-body">No. You can use TraderStat immediately without creating an account. Your data is stored locally in the app session. For persistent data across sessions, a free account option is coming soon.</div>
+    </details>
+    <details>
+      <summary>What instruments does the Risk Calculator support?</summary>
+      <div class="faq-body">The Risk Calculator supports Stocks (fractional shares), Futures (whole contracts — ES, NQ, MES, MNQ, CL, GC, etc.), and Options (premium-based sizing). The calculator automatically adjusts rounding based on the instrument type you select.</div>
+    </details>
+    <details>
+      <summary>Which prop firms does the Prop Firm Tracker support?</summary>
+      <div class="faq-body">The tracker works with any prop firm. You manually enter your account rules (max drawdown, daily loss limit, profit target) and the app tracks your progress. It includes a built-in reference table for FTMO, Apex Trader Funding, TopStep, My Forex Funds, and The Funded Trader.</div>
+    </details>
+    <details>
+      <summary>What is an R multiple?</summary>
+      <div class="faq-body">R (Risk) is the dollar amount you risk on a trade. An R multiple tells you how many times your initial risk you made or lost. A +2R trade means you made twice your risk. A -1R trade means you lost your full risk amount. Tracking R multiples lets you evaluate performance independently of account size or position size.</div>
+    </details>
+    <details>
+      <summary>Does TraderStat connect to my broker?</summary>
+      <div class="faq-body">Not currently. TraderStat is a manual trade logging tool. You enter your trades after they're executed. This keeps the app simple, fast, and broker-agnostic — it works with any broker worldwide.</div>
+    </details>
+    <details>
+      <summary>Will this always be free?</summary>
+      <div class="faq-body">The core tools will always have a free tier. In the future, advanced features like unlimited trade history and enhanced analytics may require a paid subscription. Early users will always receive the best pricing.</div>
+    </details>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ FINAL CTA -->
+<section class="final-cta">
+  <h2>Ready to Trade Smarter?</h2>
+  <p>Join traders who use TraderStat to manage risk, track performance, and pass prop firm evaluations. It's free. It takes 60 seconds. Start now.</p>
+  <a href="https://traderstat.streamlit.app" class="btn btn-primary btn-xl" target="_blank">
+    🚀 Open TraderStat — Free, No Signup
+  </a>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:1.5rem">📊</span>
+          <span style="font-size:1.2rem;font-weight:800;color:var(--primary)">TraderStat</span>
+        </div>
+        <p>Free professional trading tools for futures, options, and prop firm traders. Built by a trader, for traders.</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Tools</h4>
+          <a href="https://traderstat.streamlit.app">Trade Journal</a>
+          <a href="https://traderstat.streamlit.app">Risk Calculator</a>
+          <a href="https://traderstat.streamlit.app">Prop Firm Tracker</a>
+        </div>
+        <div class="footer-col">
+          <h4>Community</h4>
+          <a href="https://twitter.com/traderstat_io" target="_blank">Twitter / X</a>
+          <a href="https://reddit.com/r/TraderStat" target="_blank">Reddit</a>
+          <a href="https://youtube.com/@traderstat" target="_blank">YouTube</a>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <a href="#">Risk Management 101</a>
+          <a href="#">What is an R Multiple?</a>
+          <a href="#">Prop Firm Rules Guide</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 TraderStat. All rights reserved.</span>
+      <span>Built for traders, by traders. Trade smarter, not harder.</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
